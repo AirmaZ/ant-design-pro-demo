@@ -99,6 +99,7 @@ export default class SiderMenu extends PureComponent {
       );
     }
     const { location, isMobile, onCollapse } = this.props;
+    //TODO: path中包含link就有问题
     return (
       <Link
         to={itemPath}
@@ -179,7 +180,7 @@ export default class SiderMenu extends PureComponent {
   // conversion Path
   // 转化路径
   conversionPath = path => {
-    if (path && path.indexOf('http') === 0) {
+    if (path && (path.indexOf('http') === 0 || path.indexOf('link?link=http') === 0)) {
       return path;
     } else {
       return `/${path || ''}`.replace(/\/+/g, '/');

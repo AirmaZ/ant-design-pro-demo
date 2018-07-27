@@ -200,15 +200,15 @@ export default {
           children: [
             {
               name: '403',
-              path: '403',
+              path: 'exception/403',
             },
             {
               name: '404',
-              path: '404',
+              path: 'exception/404',
             },
             {
               name: '500',
-              path: '500',
+              path: 'exception/500',
             },
             {
               name: '触发异常',
