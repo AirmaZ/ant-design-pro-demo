@@ -14,6 +14,11 @@ const config = {
     title: '500',
     desc: '抱歉，服务器出错了',
   },
+  loading: {
+    img: 'https://gw.alipayobjects.com/zos/rmsportal/KpnpchXsobRgLElEozzI.svg',
+    title: 'loading',
+    desc: '正在读取菜单请稍后...',
+  },
 };
 
 export default config;

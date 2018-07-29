@@ -12,10 +12,11 @@ import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
+import Loading from '../routes/Exception/Loading';
 import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo.png';
 
 const { Content, Header, Footer } = Layout;
 const { AuthorizedRoute, check } = Authorized;
@@ -89,7 +90,7 @@ enquireScreen(b => {
 });
 
 class BasicLayout extends React.PureComponent {
-  constructor(props){
+  constructor(props) {
     super(props);
     /**
      * 根据菜单取得重定向地址.
@@ -146,7 +147,7 @@ class BasicLayout extends React.PureComponent {
   getPageTitle() {
     const { routerData, location } = this.props;
     const { pathname } = location;
-    let title = 'Ant Design Pro';
+    let title = 'BOSS运营系统';
     let currRouterData = null;
     // match params path
     Object.keys(routerData).forEach(key => {
@@ -155,7 +156,7 @@ class BasicLayout extends React.PureComponent {
       }
     });
     if (currRouterData && currRouterData.name) {
-      title = `${currRouterData.name} - Ant Design Pro`;
+      title = `${currRouterData.name} - BOSS运营系统`;
     }
     return title;
   }
@@ -323,12 +324,18 @@ class BasicLayout extends React.PureComponent {
   }
 }
 
-export default connect(({ user, global = {}, loading }) =>{
+let BasicMain = props => {
+  if (props.menuDataInfo.length) {
+    return <BasicLayout {...props} />;
+  } else return <Loading />;
+};
+
+export default connect(({ user, global = {}, loading }) => {
   return {
     currentUser: user.currentUser,
     collapsed: global.collapsed,
     fetchingNotices: loading.effects['global/fetchNotices'],
     notices: global.notices,
-    menuDataInfo:global.menuDataInfo
-  }
-})(BasicLayout);
+    menuDataInfo: global.menuDataInfo,
+  };
+})(BasicMain);

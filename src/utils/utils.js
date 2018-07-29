@@ -180,3 +180,21 @@ const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(
 export function isUrl(path) {
   return reg.test(path);
 }
+
+/**
+ * 获取url中search的get参数
+ * @param search
+ * @param variable
+ * @returns {*}
+ */
+export function getQueryVariable(search, variable) {
+  var query = search.substring(1);
+  var vars = query.split('&');
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    if (pair[0] == variable) {
+      return pair[1];
+    }
+  }
+  return false;
+}

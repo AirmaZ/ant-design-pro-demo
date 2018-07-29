@@ -1,5 +1,5 @@
 import { isUrl } from '../utils/utils';
-import {getMenuDataInfo} from '../services/api'
+import { getMenuDataInfo } from '../services/api';
 
 const menuData = [
   {
@@ -17,7 +17,7 @@ const menuData = [
       },
       {
         name: '工作台',
-        path: 'workplace',
+        path: 'dashboard/workplace',
         // hideInBreadcrumb: true,
         // hideInMenu: true,
       },
@@ -26,15 +26,15 @@ const menuData = [
   {
     name: '外链页面',
     icon: 'dashboard',
-    path: 'urlPage',
+    path: 'link',
     children: [
       {
         name: '百度',
         path: 'baidu',
-        children:[
+        children: [
           {
-            name: '百度贴吧',
-            path: 'http://tieba.baidu.com/',
+            name: '百度首页',
+            path: 'link?link=http://www.baidu.com',
           },
         ],
       },
@@ -139,15 +139,15 @@ const menuData = [
     children: [
       {
         name: '403',
-        path: '403',
+        path: 'exception/403',
       },
       {
         name: '404',
-        path: '404',
+        path: 'exception/404',
       },
       {
         name: '500',
-        path: '500',
+        path: 'exception/500',
       },
       {
         name: '触发异常',
@@ -177,7 +177,6 @@ const menuData = [
     ],
   },
 ];
-
 
 function formatter(data, parentPath = '/', parentAuthority) {
   return data.map(item => {

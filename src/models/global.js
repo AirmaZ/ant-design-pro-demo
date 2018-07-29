@@ -1,5 +1,6 @@
-import { queryNotices ,getMenuDataInfo} from '../services/api';
+import { queryNotices, getMenuDataInfo } from '../services/api';
 import { isUrl } from '../utils/utils';
+import uuidV4 from 'uuid/v4';
 
 export default {
   namespace: 'global',
@@ -7,7 +8,7 @@ export default {
   state: {
     collapsed: false,
     notices: [],
-    menuDataInfo:[]
+    menuDataInfo: [],
   },
 
   effects: {
@@ -15,7 +16,7 @@ export default {
       const data = yield call(getMenuDataInfo);
       yield put({
         type: 'setMenu',
-        payload: data,
+        payload: data.module,
       });
     },
     *fetchNotices(_, { call, put }) {
@@ -67,6 +68,7 @@ export default {
           name: 'dashboard',
           icon: 'dashboard',
           path: 'dashboard',
+          menuKey: 'menu_1',
           children: [
             {
               name: '分析页',
@@ -88,11 +90,13 @@ export default {
           name: '外链页面',
           icon: 'dashboard',
           path: 'link',
+          menuKey: 'menu_2',
           children: [
             {
               name: '百度',
               path: 'baidu',
-              children:[
+              menuKey: 'menu_2_1',
+              children: [
                 {
                   name: '百度首页',
                   path: 'link?link=http://www.baidu.com',
@@ -238,6 +242,53 @@ export default {
           ],
         },
       ];
+
+      function findChildren(aclMenuId) {
+        let result = [];
+        payload.forEach(item => {
+          if (item.parentNode === aclMenuId) {
+            let resultItem = {
+              name: item.menuName,
+              icon: item.icon || 'appstore',
+              path: item.menuUrl.split('../')[1],
+              rank: item.rank,
+              menuKey: uuidV4(),
+              children: findChildren(item.aclMenuId),
+            };
+            if (resultItem.children.length === 0 || !resultItem.children)
+              delete resultItem.children;
+            result.push(resultItem);
+          }
+        });
+        result.sort((a, b) => {
+          return a.rank - b.rank;
+        });
+        return result;
+      }
+
+      function setMenuData() {
+        let result = [];
+        payload.forEach(item => {
+          if (item.rank === 1 && item.parentNode === -1) {
+            let resultItem = {
+              name: item.menuName,
+              icon: item.icon || 'appstore',
+              path: item.menuUrl.split('../')[1],
+              rank: item.rank,
+              menuKey: uuidV4(),
+              children: findChildren(item.aclMenuId),
+            };
+            if (resultItem.children.length === 0 || !resultItem.children)
+              delete resultItem.children;
+            result.push(resultItem);
+          }
+        });
+        result.sort((a, b) => {
+          return a.rank - b.rank;
+        });
+        return result;
+      }
+
       function formatter(data, parentPath = '/', parentAuthority) {
         return data.map(item => {
           let { path } = item;
@@ -250,14 +301,18 @@ export default {
             authority: item.authority || parentAuthority,
           };
           if (item.children) {
-            result.children = formatter(item.children, `${parentPath}${item.path}/`, item.authority);
+            result.children = formatter(
+              item.children,
+              `${parentPath}${item.path}/`,
+              item.authority
+            );
           }
           return result;
         });
       }
       return {
         ...state,
-        menuDataInfo: formatter(menuData),
+        menuDataInfo: formatter(setMenuData()),
       };
     },
   },

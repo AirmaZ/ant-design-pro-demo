@@ -1,5 +1,5 @@
 import React from 'react';
-import { getPageQuery, isUrl } from '../../utils/utils';
+import { getQueryVariable, isUrl } from '../../utils/utils';
 import { routerRedux } from 'dva/router';
 import PageNotFind from '../Exception/404';
 import style from './index.less';
@@ -10,12 +10,11 @@ class Iframe extends React.Component {
   }
 
   render() {
-    const url = getPageQuery().link;
+    const url = getQueryVariable(this.props.location.search, 'link');
     const isUrlStatus = isUrl(url);
     return (
       <div className={style['iframe-box']}>
-        {
-          isUrlStatus &&
+        {isUrlStatus && (
           <iframe
             style={{
               width: '100%',
@@ -23,12 +22,10 @@ class Iframe extends React.Component {
               border: 'none',
               frameborder: 'none',
             }}
-            src={url}/>
-        }
-        {
-          !isUrlStatus &&
-          <PageNotFind/>
-        }
+            src={url}
+          />
+        )}
+        {!isUrlStatus && <PageNotFind />}
       </div>
     );
   }

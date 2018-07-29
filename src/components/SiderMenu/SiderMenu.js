@@ -4,6 +4,7 @@ import pathToRegexp from 'path-to-regexp';
 import { Link } from 'dva/router';
 import styles from './index.less';
 import { urlToList } from '../_utils/pathTools';
+import { getQueryVariable } from '../../utils/utils';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -49,12 +50,40 @@ export const getMenuMatchKeys = (flatMenuKeys, paths) =>
     []
   );
 
+/**
+ * 组装菜单的keymap
+ * @param menuData
+ * @param parentNode
+ * @param map
+ * @returns {{}}
+ */
+const setMenuKeyMap = (menuData, parentNode = [], map = {}) => {
+  menuData.map(item => {
+    if (item.children) {
+      let parentNodeCopy = parentNode.concat();
+      parentNodeCopy.push(item.menuKey || 'notKey');
+      setMenuKeyMap(item.children, parentNodeCopy, map);
+    } else {
+      map[`/${item.path}`] = parentNode;
+    }
+  });
+  return map;
+};
+
 export default class SiderMenu extends PureComponent {
   constructor(props) {
     super(props);
-    this.flatMenuKeys = getFlatMenuKeys(props.menuData);
+    this.menuKeyMap = setMenuKeyMap(props.menuData);
+    const openKeys = this.getDefaultCollapsedSubMenus(props);
+    let rootSubmenuKeys = [];
+    for (let index in this.menuKeyMap) {
+      rootSubmenuKeys = rootSubmenuKeys.concat(this.menuKeyMap[index]);
+    }
     this.state = {
-      openKeys: this.getDefaultCollapsedSubMenus(props),
+      openKeys: openKeys,
+      rootSubmenuKeys: rootSubmenuKeys.filter((element, index, self) => {
+        return self.indexOf(element) === index;
+      }),
     };
   }
 
@@ -73,11 +102,12 @@ export default class SiderMenu extends PureComponent {
    * @param  props
    */
   getDefaultCollapsedSubMenus(props) {
-    const {
-      location: { pathname },
+    let {
+      location: { pathname, search },
     } =
       props || this.props;
-    return getMenuMatchKeys(this.flatMenuKeys, urlToList(pathname));
+    if (pathname === '/link') pathname += `?link=${getQueryVariable(search, 'link')}`;
+    return this.menuKeyMap[pathname] || [];
   }
 
   /**
@@ -99,7 +129,6 @@ export default class SiderMenu extends PureComponent {
       );
     }
     const { location, isMobile, onCollapse } = this.props;
-    //TODO: path中包含link就有问题
     return (
       <Link
         to={itemPath}
@@ -139,7 +168,7 @@ export default class SiderMenu extends PureComponent {
                 item.name
               )
             }
-            key={item.path}
+            key={item.menuKey || item.name || '未知的菜单'}
           >
             {childrenItems}
           </SubMenu>
@@ -147,7 +176,7 @@ export default class SiderMenu extends PureComponent {
       }
       return null;
     } else {
-      return <Menu.Item key={item.path}>{this.getMenuItemPath(item)}</Menu.Item>;
+      return <Menu.Item key={`/${item.path}`}>{this.getMenuItemPath(item)}</Menu.Item>;
     }
   };
 
@@ -180,8 +209,10 @@ export default class SiderMenu extends PureComponent {
   // conversion Path
   // 转化路径
   conversionPath = path => {
-    if (path && (path.indexOf('http') === 0 || path.indexOf('link?link=http') === 0)) {
+    if (path && path.indexOf('http') === 0) {
       return path;
+    } else if (path.indexOf('link?link=http') === 0) {
+      return `/${path || ''}`;
     } else {
       return `/${path || ''}`.replace(/\/+/g, '/');
     }
@@ -199,7 +230,7 @@ export default class SiderMenu extends PureComponent {
 
   isMainMenu = key => {
     const { menuData } = this.props;
-    return menuData.some(item => key && (item.key === key || item.path === key));
+    return menuData.some(item => key && (item.menuKey === key || item.path === key));
   };
 
   handleOpenChange = openKeys => {
@@ -211,7 +242,7 @@ export default class SiderMenu extends PureComponent {
   };
 
   render() {
-    const { logo, menuData, collapsed, onCollapse } = this.props;
+    const { logo, menuData, collapsed, onCollapse, location } = this.props;
     const { openKeys } = this.state;
     // Don't show popup menu when it is been collapsed
     const menuProps = collapsed
@@ -219,11 +250,15 @@ export default class SiderMenu extends PureComponent {
       : {
           openKeys,
         };
-    // if pathname can't match, use the nearest parent's key
-    let selectedKeys = this.getSelectedMenuKeys();
-    if (!selectedKeys.length) {
-      selectedKeys = [openKeys[openKeys.length - 1]];
-    }
+    // // if pathname can't match, use the nearest parent's key
+    // let selectedKeys = this.getSelectedMenuKeys();
+    // if (!selectedKeys.length) {
+    //   selectedKeys = [openKeys[openKeys.length - 1]];
+    // }
+    const selectedKey =
+      location.pathname === '/link'
+        ? `${location.pathname}?link=${getQueryVariable(location.search, 'link')}`
+        : location.pathname;
     return (
       <Sider
         trigger={null}
@@ -237,7 +272,7 @@ export default class SiderMenu extends PureComponent {
         <div className={styles.logo} key="logo">
           <Link to="/">
             <img src={logo} alt="logo" />
-            <h1>Ant Design Pro</h1>
+            <h1>BOSS运营系统</h1>
           </Link>
         </div>
         <Menu
@@ -246,7 +281,7 @@ export default class SiderMenu extends PureComponent {
           mode="inline"
           {...menuProps}
           onOpenChange={this.handleOpenChange}
-          selectedKeys={selectedKeys}
+          selectedKeys={[selectedKey]}
           style={{ padding: '16px 0', width: '100%' }}
         >
           {this.getNavMenuItems(menuData)}
