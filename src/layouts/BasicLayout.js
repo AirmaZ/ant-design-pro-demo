@@ -135,9 +135,9 @@ class BasicLayout extends React.PureComponent {
       });
     });
     const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
+    // dispatch({
+    //   type: 'user/fetchCurrent',
+    // });
   }
 
   componentWillUnmount() {

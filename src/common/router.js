@@ -93,6 +93,17 @@ export const getRouterData = app => {
     '/exception/500': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
     },
+    '/exception/trigger': {
+      component: dynamicWrapper(app, ['error'], () =>
+        import('../routes/Exception/triggerException')
+      ),
+    },
+    '/result/success': {
+      component: dynamicWrapper(app, [], () => import('../routes/Result/Success')),
+    },
+    '/result/fail': {
+      component: dynamicWrapper(app, [], () => import('../routes/Result/Error')),
+    },
   };
   // Get name from ./menu.js or just set it in the router data.
   //TODO: 更新面包屑现在没有了

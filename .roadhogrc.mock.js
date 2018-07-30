@@ -135,7 +135,7 @@ const proxy = {
       path: '/base/category/list',
     });
   },
-  'GET /skynet/html5/menuInfo': (req, res) => {
+  'GET /skynet/html5/menuInfo*': (req, res) => {
     res.status(200).send({
       success: true,
       totalCount: 0,
@@ -174,8 +174,8 @@ const proxy = {
           aclMenuId: 123213,
           menuName: '外部链接',
           menuUrl: '../',
-          parentNode: -1,
-          rank: 1,
+          parentNode: 8046,
+          rank: 2,
           level: 0,
           productId: 'myportal',
           productType: 'skynet_html5',

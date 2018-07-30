@@ -42,10 +42,20 @@ function checkStatus(response) {
  * @param  {object} [options] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request(url, options) {
+export default function request(url, options={}) {
   const defaultOptions = {
     credentials: 'include',
   };
+  const [stamp, randomNum] = [new Date().getTime(), Math.floor(Math.random() * 100000)];
+  const getString = new Buffer(String(randomNum + '@@' + stamp)).toString('base64');
+  if(options.method && options.method === 'POST'){
+    if(!options.body) options['body'] = {};
+    options.body['__'] = getString;
+  } else {
+    if(url.indexOf('?') !== -1){
+      url =  `${url}&__=${getString}`
+    } else url =  `${url}?__=${getString}`
+  }
   const newOptions = { ...defaultOptions, ...options };
   if (
     newOptions.method === 'POST' ||
@@ -75,6 +85,15 @@ export default function request(url, options) {
         return response.text();
       }
       return response.json();
+    })
+    .then((response) => {
+      if(response.success === false){
+        notification.error({
+          message: `请求错误 ${response.message||"网络异常"}`,
+          description: "接口请求遭遇异常，请联系BOSS系统管理员！",
+        })
+      }
+      return response;
     })
     .catch(e => {
       const { dispatch } = store;
