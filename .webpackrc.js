@@ -1,6 +1,6 @@
 const path = require('path');
 
-const publicPath = process.env.dev === 'true'?"/":'/skynet/skynet-mobile';
+const publicPath = process.env.dev === 'true'?"/":'/skynet/skynet-mobile/';
 
 export default {
   entry: 'src/index.js',

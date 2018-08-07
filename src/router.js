@@ -12,7 +12,7 @@ const { AuthorizedRoute } = Authorized;
 
 function RouterConfig({ history, app }) {
   const routerData = getRouterData(app);
-  // const workplaceLayout = routerData['/dashboard/workplace'].component;
+  const Page403 = routerData['/exception/403'].component;
   const BasicLayout = routerData['/'].component;
   return (
     <LocaleProvider locale={zhCN}>

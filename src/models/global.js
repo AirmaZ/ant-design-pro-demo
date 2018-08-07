@@ -1,4 +1,5 @@
 import { queryNotices, getMenuDataInfo } from '../services/api';
+import { routerRedux } from 'dva/router';
 import { isUrl } from '../utils/utils';
 import uuidV4 from 'uuid/v4';
 
@@ -14,6 +15,10 @@ export default {
   effects: {
     *fetchMenuData(_, { call, put }) {
       const data = yield call(getMenuDataInfo);
+      // debugger
+      // if(!data.module || data.module.length === 0){
+      //   routerRedux.push('/exception/403');
+      // }
       yield put({
         type: 'setMenu',
         payload: data.module,
@@ -247,10 +252,11 @@ export default {
         let result = [];
         payload.forEach(item => {
           if (item.parentNode === aclMenuId) {
+            let menuUrl = item.menuUrl.split('../');
             let resultItem = {
               name: item.menuName,
               icon: item.menuIcon || 'appstore',
-              path: item.menuUrl.split('../')[1],
+              path: menuUrl[1] || menuUrl[0],
               rank: item.rank,
               menuKey: uuidV4(),
               children: findChildren(item.aclMenuId),
@@ -270,10 +276,11 @@ export default {
         let result = [];
         payload.forEach(item => {
           if (item.rank === 1 && item.parentNode === -1) {
+            let menuUrl = item.menuUrl.split('../');
             let resultItem = {
               name: item.menuName,
               icon: item.menuIcon || 'appstore',
-              path: item.menuUrl.split('../')[1],
+              path: menuUrl[1] || menuUrl[0],
               rank: item.rank,
               menuKey: uuidV4(),
               children: findChildren(item.aclMenuId),
@@ -310,10 +317,22 @@ export default {
           return result;
         });
       }
-      const menuData = setMenuData();
+      let menuData = [];
+      let result = [];
+
+      try{
+        if(!payload || payload.length ===0){
+          result = '无权限'
+        } else {
+          menuData = setMenuData();
+          result = formatter(menuData[0].children || menuData || [])
+        }
+      }catch (e) {
+
+      }
       return {
         ...state,
-        menuDataInfo: formatter(menuData[0].children || menuData || []),
+        menuDataInfo: result,
       };
     },
   },

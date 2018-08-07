@@ -12,6 +12,7 @@ import GlobalHeader from '../components/GlobalHeader';
 import GlobalFooter from '../components/GlobalFooter';
 import SiderMenu from '../components/SiderMenu';
 import NotFound from '../routes/Exception/404';
+import NoPermission from '../routes/Exception/403';
 import Loading from '../routes/Exception/Loading';
 import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
@@ -325,9 +326,13 @@ class BasicLayout extends React.PureComponent {
 }
 
 let BasicMain = props => {
-  if (props.menuDataInfo.length) {
+  if (props.menuDataInfo === '无权限'){
+    return <NoPermission />;
+  }
+  else if (props.menuDataInfo.length) {
     return <BasicLayout {...props} />;
-  } else return <Loading />;
+  }
+  else return <Loading />;
 };
 
 export default connect(({ user, global = {}, loading }) => {

@@ -74,21 +74,16 @@ export const getRouterData = app => {
     '/': {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
-    '/dashboard/workplace': {
-      component: dynamicWrapper(app, ['project', 'activities', 'chart'], () =>
-        import('../routes/Dashboard/Workplace')
-      ),
-    },
-    '/link': {
-      component: dynamicWrapper(app, [], () =>
-        import('../routes/Iframe/Iframe')
-      ),
+    // '/dashboard/workplace': {
+    //   component: dynamicWrapper(app, ['project', 'activities', 'chart'], () =>
+    //     import('../routes/Dashboard/Workplace')
+    //   ),
+    // },
+    '/exception/404': {
+      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
     '/exception/403': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
-    },
-    '/exception/404': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
     '/exception/500': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
@@ -103,6 +98,11 @@ export const getRouterData = app => {
     },
     '/result/fail': {
       component: dynamicWrapper(app, [], () => import('../routes/Result/Error')),
+    },
+    '/link': {
+      component: dynamicWrapper(app, [], () =>
+        import('../routes/Iframe/Iframe')
+      ),
     },
   };
   // Get name from ./menu.js or just set it in the router data.

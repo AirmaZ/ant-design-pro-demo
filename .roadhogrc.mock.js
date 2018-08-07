@@ -203,7 +203,7 @@ const proxy = {
         {
           aclMenuId: 123124,
           menuName: '百度',
-          menuUrl: '../link?link=http://www.baidu.com',
+          menuUrl: 'link?link=http://www.baidu.com',
           parentNode: 123213,
           rank: 2,
           level: 2,
